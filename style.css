@@ -47,9 +47,11 @@ body.dark-mode {
     --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
     --shadow: 0 2px 12px rgba(0,0,0,0.3);
     --shadow-lg: 0 4px 24px rgba(0,0,0,0.4);
+    color: var(--text);
 }
 
 body.dark-mode .header { background: #1A1A2E; border-bottom-color: #333; }
+body.dark-mode .app-title { -webkit-text-fill-color: initial; color: var(--text); background: none; }
 body.dark-mode .search-bar input { background: #2A2A2A; border-color: #333; color: var(--text); }
 body.dark-mode .restaurant-card,
 body.dark-mode .menu-card,
@@ -60,8 +62,7 @@ body.dark-mode .modal-content,
 body.dark-mode .checkout-form input,
 body.dark-mode .checkout-form textarea,
 body.dark-mode .review-section,
-body.dark-mode .restaurant-detail-meta,
-body.dark-mode .status-hero { background: var(--card); }
+body.dark-mode .restaurant-detail-meta { background: var(--card); }
 
 body.dark-mode .review-tab { background: #2A2A2A; color: var(--text-secondary); }
 body.dark-mode .review-tab.active { background: var(--primary); color: #fff; }
@@ -355,9 +356,20 @@ body.dark-mode .page-header { background: rgba(18,18,18,0.95); }
 .menu-card-content { flex: 1; min-width: 0; }
 .menu-card-name { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
 .menu-card-desc { font-size: 12px; color: var(--text-light); margin-bottom: 8px; line-height: 1.4; }
-.menu-card-footer { display: flex; justify-content: space-between; align-items: center; }
+.menu-card-footer { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 .menu-card-price { font-size: 16px; font-weight: 600; color: var(--primary); }
-.menu-card-calories { font-size: 11px; color: var(--text-light); }
+.menu-card-calories { font-size: 11px; color: var(--text-light); flex: 1; }
+
+.add-btn {
+    width: 32px; height: 32px; border: none; border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: #fff; font-size: 18px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.15s; flex-shrink: 0;
+    line-height: 1;
+}
+.add-btn:active { transform: scale(0.85); }
+.add-btn:hover { transform: scale(1.1); }
 
 /* 评价 */
 .review-section {

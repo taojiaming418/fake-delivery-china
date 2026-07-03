@@ -157,7 +157,7 @@ function showRestaurant(id) {
     
     // 菜单
     document.getElementById('menuList').innerHTML = restaurant.menu.map(m => `
-        <div class="menu-card" onclick="addToCart(${restaurant.id}, '${m.name}')">
+        <div class="menu-card">
             <div class="menu-card-img">${m.emoji}</div>
             <div class="menu-card-content">
                 <div class="menu-card-name">${m.name}</div>
@@ -165,6 +165,7 @@ function showRestaurant(id) {
                 <div class="menu-card-footer">
                     <span class="menu-card-price">¥${m.price}</span>
                     <span class="menu-card-calories">🔥 ${m.calories}kcal</span>
+                    <button class="add-btn" onclick="event.stopPropagation(); addToCart(${restaurant.id}, '${m.name}')">＋</button>
                 </div>
             </div>
         </div>
@@ -726,25 +727,12 @@ function init() {
         });
     });
     
-    // 夜晚自动进入深夜模式（22:00-6:00）
-    function checkNightMode() {
-        const hour = new Date().getHours();
-        const isNight = hour >= 22 || hour < 6;
-        const saved = localStorage.getItem('fakeDeliveryDarkMode');
-        let darkMode = false;
-        
-        if (saved !== null) {
-            darkMode = saved === 'true';
-        } else if (isNight) {
-            darkMode = true;
-        }
-        
-        if (darkMode) {
-            document.body.classList.add('dark-mode');
-        }
-        document.getElementById('darkModeBtn').textContent = darkMode ? '☀️' : '🌙';
+    // 深色模式 - 从保存的用户偏好读取
+    const savedDark = localStorage.getItem('fakeDeliveryDarkMode');
+    if (savedDark === 'true') {
+        document.body.classList.add('dark-mode');
     }
-    checkNightMode();
+    document.getElementById('darkModeBtn').textContent = savedDark === 'true' ? '☀️' : '🌙';
     
     // 深色模式切换
     document.getElementById('darkModeBtn').addEventListener('click', () => {
