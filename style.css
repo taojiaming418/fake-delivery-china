@@ -629,120 +629,30 @@ body.theme-green {
 }
 
 .map-container {
-    padding: 16px;
-}
-
-.map {
-    height: 280px;
-    background: #E8F5E9;
+    margin: 16px;
     border-radius: 16px;
-    position: relative;
     overflow: hidden;
-    border: 2px solid #C8E6C9;
+    box-shadow: var(--shadow);
+    height: 280px;
 }
 
-/* 地图网格 */
-.map::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: 
-        linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px);
-    background-size: 40px 40px;
+.real-map {
+    width: 100%;
+    height: 100%;
 }
 
-/* 道路 */
-.map-route {
-    position: absolute;
-    top: 50%;
-    left: 15%;
-    right: 15%;
-    height: 8px;
-    background: #90A4AE;
-    border-radius: 4px;
-    transform: translateY(-50%);
+/* Leaflet 弹窗适配移动端 */
+.leaflet-popup-content {
+    font-size: 13px;
+    line-height: 1.4;
 }
 
-.map-route::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 5%;
-    right: 5%;
-    height: 2px;
-    background: white;
-    transform: translateY(-50%);
-}
-
-/* 建筑物 */
-.map-building {
-    position: absolute;
-    width: 40px;
-    height: 40px;
-    background: white;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.map-building.store {
-    top: 20%;
-    left: 15%;
-}
-
-.map-building.home {
-    top: 50%;
-    right: 10%;
-    transform: translateY(-50%);
-}
-
-.map-building-label {
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 10px;
-    color: #666;
-    white-space: nowrap;
-    margin-top: 4px;
-}
-
-.rider {
-    position: absolute;
-    top: 50%;
-    left: 15%;
-    transform: translate(-50%, -50%);
-    width: 48px;
-    height: 48px;
-    background: var(--primary-color);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    transition: left 0.5s linear;
-    z-index: 10;
-}
-
-.rider-info-bubble {
-    position: absolute;
-    top: -30px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: white;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 11px;
-    white-space: nowrap;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+/* 骑手 marker 不要默认背景 */
+.rider-marker-icon {
+    background: none !important;
+    border: none !important;
+    text-align: center;
+    font-size: 32px;
 }
 
 /* 配送信息卡片 */

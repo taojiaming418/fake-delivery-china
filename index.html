@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>外卖永远不到 - 假装点外卖，真的省钱包</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
     <!-- 顶部导航栏 -->
@@ -138,21 +139,7 @@
             <div class="tracking-status" id="trackingStatus">订单已提交</div>
         </div>
         <div class="map-container">
-            <div class="map" id="map">
-                <div class="map-building store">
-                    🏪
-                    <div class="map-building-label">商家</div>
-                </div>
-                <div class="map-building home">
-                    🏠
-                    <div class="map-building-label">你的位置</div>
-                </div>
-                <div class="map-route"></div>
-                <div class="rider" id="rider">
-                    <span id="riderEmoji">🐇</span>
-                    <div class="rider-info-bubble" id="riderBubble">等待接单</div>
-                </div>
-            </div>
+            <div id="realMap" class="real-map"></div>
         </div>
         <div class="delivery-info-card">
             <div>
@@ -297,6 +284,7 @@
     </div>
 
     <script src="data.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

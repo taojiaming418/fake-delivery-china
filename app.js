@@ -357,20 +357,32 @@ function showPaymentModal(amount) {
     document.getElementById('paymentModal').classList.add('active');
 }
 
-// 开始配送追踪 - 完整订单流程
+// 生成随机位置（围绕上海中心 2-4km 范围）
+function randomLocation() {
+    // 上海人民广场附近
+    const centers = [
+        [31.2304, 121.4737], // 人民广场
+        [31.2122, 121.4510], // 徐家汇
+        [31.2492, 121.5020], // 陆家嘴
+        [31.2755, 121.4588], // 静安寺
+    ];
+    const center = centers[Math.floor(Math.random() * centers.length)];
+    const latOffset = (Math.random() - 0.5) * 0.025;
+    const lngOffset = (Math.random() - 0.5) * 0.03;
+    return [center[0] + latOffset, center[1] + lngOffset];
+}
+
+// 开始配送追踪 - 完整订单流程 + 真实地图
 function startTracking() {
     showPage('tracking');
     
-    const rider = document.getElementById('rider');
-    const riderEmoji = document.getElementById('riderEmoji');
-    const riderBubble = document.getElementById('riderBubble');
-    const courierAvatar = document.getElementById('courierAvatar');
-    const courierCard = document.getElementById('courierCard');
     const status = document.getElementById('trackingStatus');
     const statusText = document.getElementById('statusText');
     const eta = document.getElementById('etaTime');
     const riderName = document.getElementById('riderName');
     const riderRating = document.getElementById('riderRating');
+    const courierAvatar = document.getElementById('courierAvatar');
+    const courierCard = document.getElementById('courierCard');
     const messages = document.getElementById('mindfulMessages');
     const trackingTitle = document.getElementById('trackingTitle');
     const deliveryTypeBadge = document.getElementById('deliveryTypeBadge');
@@ -383,39 +395,90 @@ function startTracking() {
     const typeName = isRabbit ? '闪电' : '慢享';
     const typeLabel = isRabbit ? 'Express' : 'Standard';
     
-    riderEmoji.textContent = emoji;
     trackingTitle.textContent = `${emoji} ${typeName}配送追踪`;
     deliveryTypeBadge.textContent = typeLabel;
+    courierAvatar.textContent = emoji;
+    courierCard.style.display = 'none';
     
     const selectedRider = riderNames[Math.floor(Math.random() * riderNames.length)];
     const rating = (4.5 + Math.random() * 0.5).toFixed(1);
+    riderName.textContent = selectedRider;
+    riderRating.textContent = `${typeLabel} · ★ ${rating}`;
     
-    // 选择配送类型决定每个步骤的时间（毫秒）
+    // 生成商店和家的位置
+    const storePos = randomLocation();
+    const homePos = randomLocation();
+    
+    // 初始化真实地图
+    const mapEl = document.getElementById('realMap');
+    if (window._trackingMap) {
+        window._trackingMap.remove();
+    }
+    const map = L.map('realMap', { zoomControl: false, attributionControl: false }).setView([
+        (storePos[0] + homePos[0]) / 2,
+        (storePos[1] + homePos[1]) / 2,
+    ], 15);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+    }).addTo(map);
+    
+    // 商店 marker
+    const storeIcon = L.divIcon({ html: '<div style="font-size:28px">🏪</div>', className: 'rider-marker-icon', iconSize: [40, 40], iconAnchor: [20, 20] });
+    L.marker(storePos, { icon: storeIcon }).addTo(map).bindPopup(`<b>${state.currentRestaurant?.name || '商家'}</b><br>📍 商家位置`);
+    
+    // 家 marker
+    const homeIcon = L.divIcon({ html: '<div style="font-size:28px">🏠</div>', className: 'rider-marker-icon', iconSize: [40, 40], iconAnchor: [20, 20] });
+    L.marker(homePos, { icon: homeIcon }).addTo(map).bindPopup('<b>你的位置</b><br>📍 配送地址');
+    
+    // 路线
+    const routeLine = L.polyline([storePos, homePos], {
+        color: 'var(--primary-color, #FF6B35)',
+        weight: 4,
+        opacity: 0.7,
+        dashArray: '10 5',
+    }).addTo(map);
+    
+    // 骑手 marker
+    const riderIcon = L.divIcon({
+        html: `<div style="font-size:32px;transform:translate(-50%,-50%)">${emoji}</div>`,
+        className: 'rider-marker-icon',
+        iconSize: [48, 48],
+        iconAnchor: [24, 24],
+    });
+    const riderMarker = L.marker(storePos, { icon: riderIcon, zIndexOffset: 1000 }).addTo(map);
+    riderMarker.bindPopup(`<b>${selectedRider}</b><br>⭐ ${rating}`);
+    
+    window._trackingMap = map;
+    
+    // 配送步骤时间（毫秒）
     const stepDurations = isRabbit ? [
-        { key: 'ordered', wait: 500 },
-        { key: 'paid', wait: 800 },
-        { key: 'accepted', wait: 1200 },
-        { key: 'rider_assigned', wait: 1500 },
+        { key: 'ordered', wait: 600 },
+        { key: 'paid', wait: 1000 },
+        { key: 'accepted', wait: 1500 },
+        { key: 'rider_assigned', wait: 1800 },
         { key: 'rider_arrived', wait: 2000 },
         { key: 'preparing', wait: 2500 },
         { key: 'picked_up', wait: 1500 },
-        { key: 'delivering', wait: 3000 },
-        { key: 'delivered', wait: 1200 },
-        { key: 'completed', wait: 0 }
+        { key: 'delivering', wait: 3500 },
+        { key: 'delivered', wait: 1500 },
+        { key: 'completed', wait: 0 },
     ] : [
         { key: 'ordered', wait: 1000 },
         { key: 'paid', wait: 1500 },
-        { key: 'accepted', wait: 2000 },
+        { key: 'accepted', wait: 2500 },
         { key: 'rider_assigned', wait: 2500 },
-        { key: 'rider_arrived', wait: 3000 },
-        { key: 'preparing', wait: 4000 },
-        { key: 'picked_up', wait: 2500 },
+        { key: 'rider_arrived', wait: 3500 },
+        { key: 'preparing', wait: 4500 },
+        { key: 'picked_up', wait: 2000 },
         { key: 'delivering', wait: 5000 },
         { key: 'delivered', wait: 2000 },
-        { key: 'completed', wait: 0 }
+        { key: 'completed', wait: 0 },
     ];
     
-    // 生成时间线
+    let deliverAnimFrame = null;
+    
+    // 渲染时间线
     function renderTimeline(currentStep) {
         timelineSteps.innerHTML = orderStatuses.map((os, index) => {
             let cls = 'timeline-item';
@@ -433,21 +496,15 @@ function startTracking() {
             `;
         }).join('');
         
-        // 滚动到当前步骤
-        const currentEl = timelineSteps.querySelector('.current');
-        if (currentEl) {
-            currentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+        const cur = timelineSteps.querySelector('.current');
+        if (cur) cur.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
     
-    // 初始渲染时间线
     renderTimeline(0);
     status.textContent = '订单已提交';
     statusText.textContent = '等待支付确认...';
     eta.textContent = '--';
     deliveryTimeLabel.textContent = '订单处理中...';
-    rider.style.display = 'none';
-    document.getElementById('map').style.background = '#f0f0f0';
     
     // 正念提示
     messages.innerHTML = '';
@@ -457,125 +514,102 @@ function startTracking() {
         div.className = 'mindful-message';
         div.textContent = msg;
         messages.appendChild(div);
-        while (messages.children.length > 3) {
-            messages.removeChild(messages.firstChild);
-        }
+        while (messages.children.length > 3) messages.removeChild(messages.firstChild);
     }, 4000);
     
-    let totalTime = 0;
-    stepDurations.forEach(s => totalTime += s.wait);
-    let elapsedTime = 0;
+    // 动画：骑手沿路线移动
+    function animateRiderDelivery(duration) {
+        const startTime = Date.now();
+        function frame() {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const lat = storePos[0] + (homePos[0] - storePos[0]) * progress;
+            const lng = storePos[1] + (homePos[1] - storePos[1]) * progress;
+            riderMarker.setLatLng([lat, lng]);
+            
+            // 更新 popup
+            const remaining = Math.ceil((duration - elapsed) / 60000);
+            riderMarker.setPopupContent(`<b>${selectedRider}</b><br>📍 配送中 · ${remaining}分钟`);
+            
+            if (progress < 1) {
+                deliverAnimFrame = requestAnimationFrame(frame);
+            }
+        }
+        deliverAnimFrame = requestAnimationFrame(frame);
+    }
     
-    // 执行每个步骤
+    // 执行订单步骤
     function executeStep(index) {
         if (index >= stepDurations.length) return;
-        
         const step = stepDurations[index];
         const statusInfo = orderStatuses[index];
         
         setTimeout(() => {
-            elapsedTime += step.wait;
-            const progress = Math.min(elapsedTime / totalTime, 1);
-            
             renderTimeline(index + 1);
             status.textContent = statusInfo.label;
             statusText.textContent = statusInfo.desc;
             
-            // 更新 UI 根据当前步骤
             switch (step.key) {
                 case 'ordered':
                     deliveryTimeLabel.textContent = '等待支付...';
                     eta.textContent = '--';
                     break;
-                    
                 case 'paid':
                     deliveryTimeLabel.textContent = '等待商家接单...';
                     eta.textContent = '⌛';
                     break;
-                    
                 case 'accepted':
                     deliveryTimeLabel.textContent = '商家已接单，正在准备';
-                    const totalMinutes = isRabbit ? 15 : 25;
-                    eta.textContent = `${totalMinutes}min`;
+                    eta.textContent = `${isRabbit ? 15 : 25}min`;
                     break;
-                    
                 case 'rider_assigned':
-                    // 显示骑手信息
-                    courierAvatar.textContent = emoji;
-                    riderName.textContent = selectedRider;
-                    riderRating.textContent = `${typeLabel} · ★ ${rating} · 正在赶来`;
                     courierCard.style.display = 'block';
+                    riderMarker.setPopupContent(`<b>${selectedRider}</b><br>📍 正在赶往商家`);
                     deliveryTimeLabel.textContent = '骑手正在赶往商家';
                     break;
-                    
                 case 'rider_arrived':
-                    // 骑手到店，显示在商家位置
-                    rider.style.display = 'flex';
-                    rider.style.left = '10%';
-                    riderBubble.textContent = '已到店，等待取餐';
+                    riderMarker.setLatLng(storePos);
+                    riderMarker.setPopupContent(`<b>${selectedRider}</b><br>📍 已到店，等待取餐`);
                     deliveryTimeLabel.textContent = '骑手已到店';
                     break;
-                    
                 case 'preparing':
-                    riderBubble.textContent = '等待出餐中...';
+                    riderMarker.setPopupContent(`<b>${selectedRider}</b><br>👨‍🍳 等待商家出餐...`);
                     deliveryTimeLabel.textContent = '商家正在出餐';
                     break;
-                    
                 case 'picked_up':
-                    riderBubble.textContent = '已取餐，准备出发！';
+                    riderMarker.setPopupContent(`<b>${selectedRider}</b><br>🎒 已取餐！`);
                     deliveryTimeLabel.textContent = '骑手已取餐，即将配送';
-                    // 骑手在商家位置略微移动
-                    rider.style.left = '12%';
+                    routeLine.setStyle({ dashArray: '', color: '#FF6B35' });
                     break;
-                    
                 case 'delivering':
-                    // 骑手开始移动！配送动画
                     deliveryTimeLabel.textContent = '骑手正在配送中';
-                    const remainingTotal = isRabbit ? 5 : 15;
-                    const minutesPerStep = remainingTotal / 10;
-                    let moveSteps = 0;
-                    const moveInterval = setInterval(() => {
-                        moveSteps++;
-                        const moveProgress = moveSteps / 10;
-                        rider.style.left = `${15 + moveProgress * 70}%`;
-                        
-                        const remMin = Math.ceil(remainingTotal * (1 - moveProgress));
-                        eta.textContent = `${remMin}min`;
-                        riderBubble.textContent = `配送中 · ${remMin}分钟`;
-                        
-                        if (moveSteps >= 10) {
-                            clearInterval(moveInterval);
-                        }
-                        if (moveSteps >= 8) {
-                            status.textContent = '骑手即将到达';
-                            statusText.textContent = '商品马上送达！';
-                            deliveryTimeLabel.textContent = '即将送达！';
-                        }
-                    }, isRabbit ? 250 : 400);
+                    statusText.textContent = '骑手正在向您飞奔而来 🛵💨';
+                    animateRiderDelivery(isRabbit ? 3500 : 5000);
+                    // 配送中定时更新 ETA
+                    const etaInterval = setInterval(() => {
+                        const mins = Math.max(0, Math.ceil((stepDurations[7].wait - 500) / 60000));
+                        eta.textContent = `${mins}min`;
+                    }, 1000);
+                    setTimeout(() => clearInterval(etaInterval), stepDurations[7].wait);
                     break;
-                    
                 case 'delivered':
-                    status.textContent = '商品已送达';
-                    statusText.textContent = '祝您用餐愉快！';
-                    deliveryTimeLabel.textContent = '已送达！';
-                    riderBubble.textContent = '已送达 📬';
+                    riderMarker.setLatLng(homePos);
+                    riderMarker.setPopupContent(`<b>${selectedRider}</b><br>📬 已送达！`);
                     eta.textContent = '0min';
+                    deliveryTimeLabel.textContent = '已送达！';
+                    statusText.textContent = '祝您用餐愉快！';
                     break;
-                    
                 case 'completed':
-                    // 配送完成
                     clearInterval(messageInterval);
-                    setTimeout(() => showCompletion(), 500);
+                    if (deliverAnimFrame) cancelAnimationFrame(deliverAnimFrame);
+                    setTimeout(() => showCompletion(), 600);
                     break;
             }
             
-            // 执行下一步
             executeStep(index + 1);
-            
         }, step.wait);
     }
     
-    // 开始订单流程
     executeStep(0);
 }
 
