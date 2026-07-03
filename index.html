@@ -125,15 +125,23 @@
 
     <!-- 配送追踪页面 -->
     <main id="trackingPage" class="page">
+        <!-- 订单状态时间线 -->
+        <div class="order-timeline" id="orderTimeline">
+            <div class="timeline-title">📋 订单状态</div>
+            <div id="timelineSteps">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+        
         <div class="tracking-header">
             <h2 id="trackingTitle"> 闪电配送追踪</h2>
-            <div class="tracking-status" id="trackingStatus">骑手已接单</div>
+            <div class="tracking-status" id="trackingStatus">订单已提交</div>
         </div>
         <div class="map-container">
             <div class="map" id="map">
                 <div class="map-building store">
                     🏪
-                    <div class="map-building-label">商家已接单</div>
+                    <div class="map-building-label">商家</div>
                 </div>
                 <div class="map-building home">
                     🏠
@@ -142,25 +150,25 @@
                 <div class="map-route"></div>
                 <div class="rider" id="rider">
                     <span id="riderEmoji">🐇</span>
-                    <div class="rider-info-bubble" id="riderBubble">骑手 · 5分钟</div>
+                    <div class="rider-info-bubble" id="riderBubble">等待接单</div>
                 </div>
             </div>
         </div>
         <div class="delivery-info-card">
             <div>
-                <div class="delivery-time" id="etaTime">5min</div>
-                <div class="delivery-time-label">骑手正在飞速赶来！</div>
+                <div class="delivery-time" id="etaTime">--</div>
+                <div class="delivery-time-label">订单处理中...</div>
             </div>
             <div class="delivery-type-badge" id="deliveryTypeBadge">Express</div>
         </div>
-        <div class="courier-card">
+        <div class="courier-card" id="courierCard" style="display:none">
             <div class="courier-card-header">骑手信息 🛵</div>
             <div class="courier-card-subtitle">模拟数据</div>
             <div class="courier-info">
                 <div class="courier-avatar" id="courierAvatar">🐇</div>
                 <div class="courier-details">
                     <div class="courier-name" id="riderName">闪电骑手</div>
-                    <div class="courier-rating">Express · ★ 4.9 · 正在赶来</div>
+                    <div class="courier-rating" id="riderRating">Express · ★ 4.9</div>
                 </div>
                 <button class="courier-call-btn" onclick="showToast('这是假的，打不通 😄')">📞 呼叫</button>
             </div>
@@ -168,7 +176,7 @@
         <div class="current-status">
             <div>
                 <div class="status-label">当前状态</div>
-                <div class="status-text" id="statusText">闪电送达 5分钟 ⚡</div>
+                <div class="status-text" id="statusText">订单处理中...</div>
             </div>
             <button class="back-to-start-btn" onclick="showPage('home')"> 返回首页</button>
         </div>
@@ -247,6 +255,44 @@
                 <p>灵感来自韩国爆火的"多巴胺网站"趋势。</p>
                 <p class="info-note">⚠️ 本应用所有订单均为虚拟，不会产生真实消费。</p>
             </div>
+        </div>
+    </div>
+
+    <!-- 商品配置弹窗 -->
+    <div class="modal" id="itemConfigModal">
+        <div class="modal-content item-config-modal">
+            <div class="modal-header">
+                <h2 id="configItemName">商品名称</h2>
+                <button class="modal-close" id="closeConfigBtn">✕</button>
+            </div>
+            <div class="config-item-preview">
+                <div class="config-item-img" id="configItemImg">🍔</div>
+                <div class="config-item-info">
+                    <div class="config-item-desc" id="configItemDesc">商品描述</div>
+                    <div class="config-item-calories" id="configItemCalories">🔥 0kcal</div>
+                </div>
+            </div>
+            <div class="config-options" id="configOptions">
+                <!-- 动态生成 -->
+            </div>
+            <div class="config-footer">
+                <div class="config-price">
+                    <span>¥</span>
+                    <span id="configPrice">0</span>
+                </div>
+                <button class="config-add-btn" id="configAddBtn">加入购物车</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 支付弹窗 -->
+    <div class="modal" id="paymentModal">
+        <div class="modal-content">
+            <div class="payment-icon">💰</div>
+            <h2>支付成功</h2>
+            <p class="payment-amount">¥<span id="paymentAmount">0</span></p>
+            <p class="payment-note">（假的，没真扣钱 😄）</p>
+            <button class="modal-close-btn" id="paymentCloseBtn">查看订单</button>
         </div>
     </div>
 
