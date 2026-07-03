@@ -623,7 +623,7 @@ function startTracking() {
     
     // ===== 配送步骤执行 =====
     // 为了让动画有足够时间，步骤间隔拉长
-    const stepDurations = isRabbit ? [500, 800, 1200, 2000, 1500, 2500, 1500, 5000, 1500, 0] : [800, 1200, 2000, 3000, 2000, 4000, 2000, 6500, 2000, 0];
+    const stepDurations = isRabbit ? [500, 800, 1200, 2000, 1500, 2500, 1500, 5000, 5000, 0] : [800, 1200, 2000, 3000, 2000, 4000, 2000, 6500, 6500, 0];
     
     function updateStatus(index, statusInfo) {
         statusIcon.textContent = statusInfo.icon;
