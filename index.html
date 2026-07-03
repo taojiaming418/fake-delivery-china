@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>外卖永远不到 - 假装点外卖，真的省钱包</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="header">
+        <div class="header-left">
+            <button class="theme-btn" id="themeBtn" title="切换主题">🎨</button>
+        </div>
+        <div class="header-center">
+            <h1 class="app-title">🛵 外卖永远不到</h1>
+        </div>
+        <div class="header-right">
+            <button class="icon-btn" id="historyBtn" title="订单历史">🏆</button>
+            <button class="icon-btn" id="infoBtn" title="关于">❓</button>
+            <button class="icon-btn" id="resetBtn" title="重置">↺</button>
+        </div>
+    </header>
+
+    <!-- 主页面 - 餐厅列表 -->
+    <main id="homePage" class="page active">
+        <!-- 搜索栏 -->
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="🔍 搜索餐厅或菜品...">
+        </div>
+
+        <!-- 配送类型选择 -->
+        <div class="delivery-type-selector">
+            <button class="delivery-type-btn active" data-type="rabbit">
+                <span class="delivery-icon">🐇</span>
+                <span class="delivery-name">闪电配送</span>
+                <span class="delivery-desc">超快体验</span>
+            </button>
+            <button class="delivery-type-btn" data-type="turtle">
+                <span class="delivery-icon">🐢</span>
+                <span class="delivery-name">慢享配送</span>
+                <span class="delivery-desc">慢慢享受</span>
+            </button>
+        </div>
+
+        <!-- 提示信息 -->
+        <div class="notice-bar">
+             这里没有真实的订单、支付或配送，纯属娱乐！
+        </div>
+
+        <!-- 餐厅列表 -->
+        <div class="restaurant-list" id="restaurantList">
+            <!-- 动态生成 -->
+        </div>
+
+        <!-- 购物车悬浮按钮 -->
+        <div class="cart-fab" id="cartFab" style="display: none;">
+            <span class="cart-count" id="cartCount">0</span>
+            <span class="cart-text">去结算</span>
+        </div>
+    </main>
+
+    <!-- 餐厅详情页 -->
+    <main id="restaurantPage" class="page">
+        <div class="page-header">
+            <button class="back-btn" id="backToHome">← 返回</button>
+            <h2 id="restaurantName">餐厅名称</h2>
+        </div>
+        <div class="restaurant-info" id="restaurantInfo">
+            <!-- 动态生成 -->
+        </div>
+        <div class="menu-list" id="menuList">
+            <!-- 动态生成 -->
+        </div>
+    </main>
+
+    <!-- 购物车页面 -->
+    <main id="cartPage" class="page">
+        <div class="page-header">
+            <button class="back-btn" id="backToRestaurant">← 返回</button>
+            <h2>🛒 购物车</h2>
+        </div>
+        <div class="cart-items" id="cartItems">
+            <!-- 动态生成 -->
+        </div>
+        <div class="cart-summary" id="cartSummary">
+            <div class="summary-row">
+                <span>商品总价</span>
+                <span id="subtotal">¥0</span>
+            </div>
+            <div class="summary-row">
+                <span>配送费</span>
+                <span id="deliveryFee">¥0</span>
+            </div>
+            <div class="summary-row total">
+                <span>合计</span>
+                <span id="totalPrice">¥0</span>
+            </div>
+        </div>
+        <button class="checkout-btn" id="checkoutBtn">去结算</button>
+    </main>
+
+    <!-- 结算页面 -->
+    <main id="checkoutPage" class="page">
+        <div class="page-header">
+            <button class="back-btn" id="backToCart">← 返回</button>
+            <h2>📍 填写地址</h2>
+        </div>
+        <div class="checkout-form">
+            <div class="form-group">
+                <label>收货人</label>
+                <input type="text" id="receiverName" placeholder="请输入姓名">
+            </div>
+            <div class="form-group">
+                <label>手机号</label>
+                <input type="tel" id="receiverPhone" placeholder="请输入手机号">
+            </div>
+            <div class="form-group">
+                <label>配送地址</label>
+                <textarea id="receiverAddress" placeholder="请输入详细地址" rows="3"></textarea>
+            </div>
+        </div>
+        <button class="confirm-order-btn" id="confirmOrderBtn">确认下单（假装）</button>
+    </main>
+
+    <!-- 配送追踪页面 -->
+    <main id="trackingPage" class="page">
+        <div class="tracking-header">
+            <h2> 配送中...</h2>
+            <div class="tracking-status" id="trackingStatus">骑手已接单</div>
+        </div>
+        <div class="map-container">
+            <div class="map" id="map">
+                <div class="map-route"></div>
+                <div class="rider" id="rider">🛵</div>
+                <div class="destination">🏠</div>
+            </div>
+        </div>
+        <div class="tracking-info">
+            <div class="info-row">
+                <span>预计送达</span>
+                <span id="etaTime">15分钟</span>
+            </div>
+            <div class="info-row">
+                <span>骑手</span>
+                <span id="riderName">张师傅</span>
+            </div>
+            <div class="info-row">
+                <span>距离</span>
+                <span id="distance">2.3km</span>
+            </div>
+        </div>
+        <div class="mindful-messages" id="mindfulMessages">
+            <!-- 动态显示正念提示 -->
+        </div>
+    </main>
+
+    <!-- 配送完成弹窗 -->
+    <div class="modal" id="completionModal">
+        <div class="modal-content">
+            <div class="modal-icon">🎉</div>
+            <h2>配送完成！</h2>
+            <p class="modal-subtitle">（当然，什么都没送到 😄）</p>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="savedMoney">¥0</div>
+                    <div class="stat-label">省下的钱</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="savedCalories">0</div>
+                    <div class="stat-label">省下的卡路里</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="orderCount">0</div>
+                    <div class="stat-label">完成订单数</div>
+                </div>
+            </div>
+            <button class="modal-close-btn" id="modalCloseBtn">太棒了！</button>
+        </div>
+    </div>
+
+    <!-- 订单历史弹窗 -->
+    <div class="modal" id="historyModal">
+        <div class="modal-content history-modal">
+            <div class="modal-header">
+                <h2>🏆 订单历史</h2>
+                <button class="modal-close" id="closeHistoryBtn">✕</button>
+            </div>
+            <div class="history-stats">
+                <div class="history-stat">
+                    <span class="history-stat-value" id="totalOrders">0</span>
+                    <span class="history-stat-label">总订单</span>
+                </div>
+                <div class="history-stat">
+                    <span class="history-stat-value" id="totalSaved">¥0</span>
+                    <span class="history-stat-label">总省钱</span>
+                </div>
+                <div class="history-stat">
+                    <span class="history-stat-value" id="totalCalories">0</span>
+                    <span class="history-stat-label">总省卡路里</span>
+                </div>
+            </div>
+            <div class="achievements" id="achievements">
+                <h3>🎖️ 成就</h3>
+                <div class="achievement-list" id="achievementList">
+                    <!-- 动态生成 -->
+                </div>
+            </div>
+            <div class="order-list" id="orderList">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 关于弹窗 -->
+    <div class="modal" id="infoModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>关于</h2>
+                <button class="modal-close" id="closeInfoBtn">✕</button>
+            </div>
+            <div class="info-content">
+                <p>🛵 <strong>外卖永远不到</strong></p>
+                <p>一个帮你戒掉深夜点外卖冲动的假装点餐应用。</p>
+                <p>灵感来自韩国爆火的"多巴胺网站"趋势。</p>
+                <p class="info-note">⚠️ 本应用所有订单均为虚拟，不会产生真实消费。</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
