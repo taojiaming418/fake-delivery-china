@@ -68,6 +68,30 @@ function showPage(pageId) {
     updateCartFab();
 }
 
+const cuisineEmojis = {
+    '火锅': '',
+    '烧烤': '🍢',
+    '奶茶': '🧋',
+    '小吃': '🍜',
+    '川菜': '🌶️',
+    '粤菜': '🥟',
+    '日料': '🍣',
+    '西餐': '🥩',
+    '快餐': '🍔',
+    '粥粉面': '🍜',
+    '炸鸡': '🍗',
+    '咖啡': '☕',
+    '烘焙': '🥐',
+    '水果': '🍉',
+    '夜宵': '🍺',
+};
+
+function bannerEmoji(r) {
+    if (r.emoji) return r.emoji;
+    if (r.menu && r.menu.length > 0 && r.menu[0].emoji) return r.menu[0].emoji;
+    return cuisineEmojis[r.cuisine] || '🍽️';
+}
+
 // 渲染餐厅列表
 function renderRestaurants(filter = '') {
     const list = document.getElementById('restaurantList');
@@ -80,7 +104,7 @@ function renderRestaurants(filter = '') {
     list.innerHTML = filtered.map(r => `
         <div class="restaurant-card" onclick="showRestaurant(${r.id})">
             <div class="restaurant-banner" style="background: ${r.bannerColor}">
-                <span class="restaurant-banner-emoji">${r.emoji}</span>
+                <span class="restaurant-banner-emoji">${bannerEmoji(r)}</span>
                 <span class="restaurant-banner-tag">${r.tag}</span>
             </div>
             <div class="restaurant-body">
@@ -125,7 +149,7 @@ function showRestaurant(id) {
     const banner = restaurant.reviewList?.[0]?.content || restaurant.name;
     document.getElementById('restaurantInfo').innerHTML = `
         <div class="restaurant-banner-detail" style="background: ${restaurant.bannerColor || '#FF6B35'}">
-            <div class="banner-emoji">${restaurant.emoji}</div>
+            <div class="banner-emoji">${bannerEmoji(restaurant)}</div>
             <div class="banner-info">
                 <div class="banner-name">${restaurant.name}</div>
                 <div class="banner-stats">
@@ -626,17 +650,21 @@ function startTracking() {
         roadCoords = routeCoords;
         
         // 绘制路线
-        if (roadCoords && roadCoords.length >= 2) {
+        if (roadCoords && roadCoords.length >= 5) {
             roadLine = L.polyline(roadCoords, {
                 color: '#FF6B35', weight: 4, opacity: 0.7
             }).addTo(map);
         } else {
-            // 降级：生成几个中间点看起来像走了一段路
-            const mid = [
-                [(storePos[0]+homePos[0])/2 + (Math.random()-0.5)*0.008, (storePos[1]+homePos[1])/2 + (Math.random()-0.5)*0.01],
-                [(storePos[0]+homePos[0])/2 + (Math.random()-0.5)*0.006, (storePos[1]+homePos[1])/2 + (Math.random()-0.5)*0.008]
-            ];
-            roadCoords = [storePos, mid[0], mid[1], homePos];
+            // 降级：生成弯曲多段线模拟道路（至少10个点让动画平滑）
+            const segments = 10;
+            const coords = [];
+            for (let i = 0; i <= segments; i++) {
+                const t = i / segments;
+                const lat = storePos[0] + (homePos[0] - storePos[0]) * t + Math.sin(t * Math.PI * 3) * 0.004;
+                const lng = storePos[1] + (homePos[1] - storePos[1]) * t + Math.cos(t * Math.PI * 2) * 0.005;
+                coords.push([lat, lng]);
+            }
+            roadCoords = coords;
             roadLine = L.polyline(roadCoords, {
                 color: '#FF6B35', weight: 4, opacity: 0.7
             }).addTo(map);
@@ -644,9 +672,18 @@ function startTracking() {
         
         executeStep(0);
     }).catch(() => {
-        roadCoords = [storePos, homePos];
+        // 降级：同样生成弯曲路径
+        const segments = 10;
+        const coords = [];
+        for (let i = 0; i <= segments; i++) {
+            const t = i / segments;
+            const lat = storePos[0] + (homePos[0] - storePos[0]) * t + Math.sin(t * Math.PI * 3) * 0.004;
+            const lng = storePos[1] + (homePos[1] - storePos[1]) * t + Math.cos(t * Math.PI * 2) * 0.005;
+            coords.push([lat, lng]);
+        }
+        roadCoords = coords;
         roadLine = L.polyline(roadCoords, {
-            color: '#FF6B35', weight: 4, opacity: 0.6
+            color: '#FF6B35', weight: 4, opacity: 0.7
         }).addTo(map);
         executeStep(0);
     });
