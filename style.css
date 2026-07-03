@@ -73,6 +73,69 @@ body.dark-mode .saved-address-info { color: #CCC; }
 body.dark-mode .config-option-btn { background: #2A2A2A; color: var(--text-secondary); border-color: #444; }
 body.dark-mode .config-option-btn.active { background: var(--primary); color: #fff; }
 
+/* 深色模式文字显式覆盖 */
+body.dark-mode .restaurant-name,
+body.dark-mode .menu-card-name,
+body.dark-mode .menu-card-desc,
+body.dark-mode .menu-card-price,
+body.dark-mode .menu-card-calories,
+body.dark-mode .cart-item-name,
+body.dark-mode .cart-item-restaurant,
+body.dark-mode .cart-item-config,
+body.dark-mode .cart-item-price,
+body.dark-mode .delivery-time-label,
+body.dark-mode .courier-name,
+body.dark-mode .courier-rating,
+body.dark-mode .review-item-name,
+body.dark-mode .review-item-content,
+body.dark-mode .review-score,
+body.dark-mode .review-count,
+body.dark-mode .status-text,
+body.dark-mode .status-label,
+body.dark-mode .back-to-home-btn,
+body.dark-mode .form-group label,
+body.dark-mode .app-title,
+body.dark-mode .delivery-name,
+body.dark-mode .delivery-desc,
+body.dark-mode .checkout-form textarea,
+body.dark-mode .meta-label,
+body.dark-mode .meta-value,
+body.dark-mode .banner-name,
+body.dark-mode .banner-stats,
+body.dark-mode .restaurant-cuisine,
+body.dark-mode .rating-score,
+body.dark-mode .review-item-time,
+body.dark-mode .summary-row,
+body.dark-mode .config-option-label,
+body.dark-mode .config-item-desc,
+body.dark-mode .config-item-calories,
+body.dark-mode .modal-subtitle,
+body.dark-mode .stat-value,
+body.dark-mode .stat-label,
+body.dark-mode .achievement-badge,
+body.dark-mode .order-item-restaurant,
+body.dark-mode .order-item-time,
+body.dark-mode .order-item-items,
+body.dark-mode .order-item-savings,
+body.dark-mode .payment-amount,
+body.dark-mode .payment-note,
+body.dark-mode .notice-bar,
+body.dark-mode .mindful-message,
+body.dark-mode .review-bar-row,
+body.dark-mode .tracking-header h2,
+body.dark-mode .courier-card-header,
+body.dark-mode .courier-card-subtitle {
+    color: var(--text) !important;
+}
+
+body.dark-mode .menu-card-price,
+body.dark-mode .cart-item-price,
+body.dark-mode .rating-score,
+body.dark-mode .review-score,
+body.dark-mode .payment-amount { color: var(--primary) !important; }
+body.dark-mode .config-option-btn { background: #2A2A2A; color: var(--text-secondary); border-color: #444; }
+body.dark-mode .config-option-btn.active { background: var(--primary); color: #fff; }
+
 /* ---------- 头部 ---------- */
 .header {
     position: sticky;
@@ -509,9 +572,21 @@ body.dark-mode .page-header { background: rgba(18,18,18,0.95); }
     border-radius: var(--radius);
     overflow: hidden;
     box-shadow: var(--shadow);
-    height: 320px;
+    height: 380px;
+    position: relative;
+    z-index: 1;
 }
-.real-map { width: 100%; height: 100%; }
+
+.real-map {
+    width: 100%;
+    height: 100%;
+}
+
+.real-map .leaflet-pane { z-index: 1; }
+.real-map .leaflet-top,
+.real-map .leaflet-bottom { z-index: 2; }
+.real-map .leaflet-control { z-index: 3; }
+
 .rider-marker-icon { background: none !important; border: none !important; text-align: center; }
 
 /* 配送信息卡 */
