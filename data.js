@@ -563,7 +563,8 @@ const orderStatuses = [
     { key: "rider_assigned", label: "骑手已接单", icon: "🛵", desc: "骑手正在赶来取餐" },
     { key: "rider_arrived", label: "骑手已到店", icon: "📍", desc: "骑手已到达商家" },
     { key: "preparing", label: "商家出餐中", icon: "👨‍🍳", desc: "美食正在制作中" },
-    { key: "picked_up", label: "骑手已取餐", icon: "🎒", desc: "骑手正在向您飞奔而来" },
+    { key: "picked_up", label: "骑手已取餐", icon: "🎒", desc: "骑手已取餐" },
+    { key: "delivering", label: "配送中", icon: "🛵", desc: "骑手正在向您飞奔而来" },
     { key: "delivered", label: "商品已送达", icon: "📦", desc: "祝您用餐愉快！" },
     { key: "completed", label: "订单完成", icon: "✅", desc: "感谢您的假装消费！" }
 ];
