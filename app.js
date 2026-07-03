@@ -65,6 +65,7 @@ function showPage(pageId) {
     document.getElementById(pageId + 'Page').classList.add('active');
     state.currentPage = pageId;
     window.scrollTo(0, 0);
+    updateCartFab();
 }
 
 // 渲染餐厅列表
@@ -301,8 +302,9 @@ function addToCart(restaurantId, itemName) {
 function updateCartFab() {
     const fab = document.getElementById('cartFab');
     const count = document.getElementById('cartCount');
+    const hiddenPages = ['cart', 'checkout', 'tracking'];
     
-    if (state.cart.length > 0) {
+    if (state.cart.length > 0 && !hiddenPages.includes(state.currentPage)) {
         fab.style.display = 'flex';
         count.textContent = state.cart.length;
     } else {
