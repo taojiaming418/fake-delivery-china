@@ -582,11 +582,6 @@ body.dark-mode .page-header { background: rgba(18,18,18,0.95); }
     height: 100%;
 }
 
-.real-map .leaflet-pane { z-index: 1; }
-.real-map .leaflet-top,
-.real-map .leaflet-bottom { z-index: 2; }
-.real-map .leaflet-control { z-index: 3; }
-
 .rider-marker-icon { background: none !important; border: none !important; text-align: center; }
 
 /* 配送信息卡 */

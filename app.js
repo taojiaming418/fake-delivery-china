@@ -489,56 +489,71 @@ function startTracking() {
     riderName.textContent = selectedRider;
     riderRating.textContent = `${typeLabel} · ★ ${(4.5+Math.random()*0.5).toFixed(1)}`;
     
-    // 生成商店和家的位置（用固定种子确保每次不同但合理）
+    // 生成商店和家的位置
     const storePos = randomLocation();
     const homePos = randomLocation();
     
-    // 初始化真实地图
+    // === 初始化地图（修复 display:none 后地图白屏/灰屏）===
     if (window._trackingMap) window._trackingMap.remove();
+    
+    const mapEl = document.getElementById('realMap');
     const map = L.map('realMap', {
         zoomControl: false,
         attributionControl: false
-    }).setView([(storePos[0] + homePos[0]) / 2, (storePos[1] + homePos[1]) / 2], 14);
+    });
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
-        attribution: '© OSM'
+        attribution: '© OpenStreetMap'
     }).addTo(map);
     
-    setTimeout(() => map.invalidateSize(), 400);
+    // 强制使地图适配容器尺寸（因为页面刚 display:block，Leaflet可能算不准）
+    function resizeMap() {
+        try { map.invalidateSize(); } catch(e) {}
+    }
+    // 多次调用确保尺寸正确
+    resizeMap();
+    setTimeout(resizeMap, 100);
+    setTimeout(resizeMap, 400);
+    setTimeout(resizeMap, 800);
     
     // 商店图标
     const storeIcon = L.divIcon({
-        html: '<div style="font-size:30px;background:rgba(255,255,255,0.95);border-radius:50%;padding:4px;box-shadow:0 2px 8px rgba(0,0,0,0.3)">🏪</div>',
-        className: 'rider-marker-icon', iconSize: [44, 44], iconAnchor: [22, 22]
+        html: '<div style="font-size:30px;background:#fff;border-radius:50%;padding:4px;box-shadow:0 2px 8px rgba(0,0,0,0.3)">🏪</div>',
+        className: '', iconSize: [44, 44], iconAnchor: [22, 22]
     });
     const storeMarker = L.marker(storePos, { icon: storeIcon }).addTo(map);
     storeMarker.bindPopup(`<b>${state.currentRestaurant?.name || '商家'}</b>`);
     
     // 家图标
     const homeIcon = L.divIcon({
-        html: '<div style="font-size:30px;background:rgba(255,255,255,0.95);border-radius:50%;padding:4px;box-shadow:0 2px 8px rgba(0,0,0,0.3)">🏠</div>',
-        className: 'rider-marker-icon', iconSize: [44, 44], iconAnchor: [22, 22]
+        html: '<div style="font-size:30px;background:#fff;border-radius:50%;padding:4px;box-shadow:0 2px 8px rgba(0,0,0,0.3)">🏠</div>',
+        className: '', iconSize: [44, 44], iconAnchor: [22, 22]
     });
     const homeMarker = L.marker(homePos, { icon: homeIcon }).addTo(map);
     homeMarker.bindPopup('<b>你的收货地址</b>');
     
-    // 骑手初始位置（商店附近随机偏移，模拟骑手从附近赶来）
-    const riderSpawnLat = storePos[0] + (Math.random() - 0.5) * 0.015;
-    const riderSpawnLng = storePos[1] + (Math.random() - 0.5) * 0.02;
-    const riderSpawn = [riderSpawnLat, riderSpawnLng];
+    // 骑手初始位置（商店附近随机偏移）
+    const riderSpawn = [
+        storePos[0] + (Math.random() - 0.5) * 0.012,
+        storePos[1] + (Math.random() - 0.5) * 0.016
+    ];
     
     const riderIcon = L.divIcon({
-        html: `<div style="font-size:34px;transform:translate(-50%,-50%);filter:drop-shadow(0 2px 3px rgba(0,0,0,0.3))">${emoji}</div>`,
-        className: 'rider-marker-icon', iconSize: [48, 48], iconAnchor: [24, 24]
+        html: `<div style="font-size:34px;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.3))">${emoji}</div>`,
+        className: '', iconSize: [48, 48], iconAnchor: [24, 24]
     });
     const riderMarker = L.marker(riderSpawn, { icon: riderIcon, zIndexOffset: 1000 }).addTo(map);
     riderMarker.bindPopup(`<b>${selectedRider}</b>`);
     
+    // 先用三点让三者同时显示
+    const allPoints = [storePos, homePos, riderSpawn];
+    map.fitBounds(L.latLngBounds(allPoints), { padding: [50, 50], maxZoom: 15 });
+    
     window._trackingMap = map;
     
     // ===== 从OSRM获取道路路径 =====
-    let roadCoords = null; // [[lat,lng],...] 沿道路坐标
+    let roadCoords = null;
     let roadLine = null;
     
     function fetchRoute(start, end) {
@@ -548,7 +563,6 @@ function startTracking() {
             .then(data => {
                 if (data.code === 'Ok' && data.routes.length > 0) {
                     const coords = data.routes[0].geometry.coordinates;
-                    // OSRM returns [lng, lat], convert to [lat, lng]
                     return coords.map(c => [c[1], c[0]]);
                 }
                 return null;
@@ -556,7 +570,7 @@ function startTracking() {
             .catch(() => null);
     }
     
-    // 沿坐标数组做线性插值动画
+    // 沿坐标数组做平滑动画
     function animateAlongPath(coords, duration, callback) {
         if (!coords || coords.length < 2) {
             if (callback) callback();
@@ -564,27 +578,28 @@ function startTracking() {
         }
         const startTime = Date.now();
         function frame() {
-            const p = Math.min((Date.now() - startTime) / duration, 1);
-            const totalSegments = coords.length - 1;
-            const pos = p * totalSegments;
-            const idx = Math.min(Math.floor(pos), totalSegments - 1);
+            const elapsed = Date.now() - startTime;
+            const p = Math.min(elapsed / duration, 1);
+            const total = coords.length - 1;
+            const pos = p * total;
+            const idx = Math.min(Math.floor(pos), total - 1);
             const frac = pos - idx;
             const lat = coords[idx][0] + (coords[idx + 1][0] - coords[idx][0]) * frac;
             const lng = coords[idx][1] + (coords[idx + 1][1] - coords[idx][1]) * frac;
             riderMarker.setLatLng([lat, lng]);
             if (p < 1) {
                 requestAnimationFrame(frame);
-            } else if (callback) {
+            } else {
                 riderMarker.setLatLng(coords[coords.length - 1]);
-                callback();
+                if (callback) callback();
             }
         }
         requestAnimationFrame(frame);
     }
     
     // ===== 配送步骤执行 =====
-    const stepDurations = isRabbit ? [600, 1000, 1500, 1800, 2000, 2500, 1500, 4000, 1500, 0] : [1000, 1500, 2500, 2500, 3500, 4500, 2000, 5500, 2000, 0];
-    let elapsed = 0;
+    // 为了让动画有足够时间，步骤间隔拉长
+    const stepDurations = isRabbit ? [500, 800, 1200, 2000, 1500, 2500, 1500, 5000, 1500, 0] : [800, 1200, 2000, 3000, 2000, 4000, 2000, 6500, 2000, 0];
     
     function updateStatus(index, statusInfo) {
         statusIcon.textContent = statusInfo.icon;
@@ -610,34 +625,33 @@ function startTracking() {
     fetchRoute(storePos, homePos).then(routeCoords => {
         roadCoords = routeCoords;
         
-        // 绘制路线 - 有道路数据就用道路路径
+        // 绘制路线
         if (roadCoords && roadCoords.length >= 2) {
             roadLine = L.polyline(roadCoords, {
                 color: '#FF6B35', weight: 4, opacity: 0.7
             }).addTo(map);
-            // 缩放适配路线
-            map.fitBounds(L.latLngBounds(roadCoords), { padding: [40, 40] });
         } else {
-            // 降级：直线路径
-            roadLine = L.polyline([storePos, homePos], {
-                color: '#FF6B35', weight: 4, opacity: 0.6, dashArray: '10 6'
-            }).addTo(map);
-            roadCoords = [
-                [storePos[0], storePos[1]], 
-                [(storePos[0]+homePos[0])/2, (storePos[1]+homePos[1])/2],
-                [homePos[0], homePos[1]]
+            // 降级：生成几个中间点看起来像走了一段路
+            const mid = [
+                [(storePos[0]+homePos[0])/2 + (Math.random()-0.5)*0.008, (storePos[1]+homePos[1])/2 + (Math.random()-0.5)*0.01],
+                [(storePos[0]+homePos[0])/2 + (Math.random()-0.5)*0.006, (storePos[1]+homePos[1])/2 + (Math.random()-0.5)*0.008]
             ];
+            roadCoords = [storePos, mid[0], mid[1], homePos];
+            roadLine = L.polyline(roadCoords, {
+                color: '#FF6B35', weight: 4, opacity: 0.7
+            }).addTo(map);
         }
         
         executeStep(0);
     }).catch(() => {
-        // 降级
-        roadLine = L.polyline([storePos, homePos], {
-            color: '#FF6B35', weight: 4, opacity: 0.6, dashArray: '10 6'
-        }).addTo(map);
         roadCoords = [storePos, homePos];
+        roadLine = L.polyline(roadCoords, {
+            color: '#FF6B35', weight: 4, opacity: 0.6
+        }).addTo(map);
         executeStep(0);
     });
+    
+    let riderAtStore = false;
     
     function executeStep(index) {
         if (index >= stepDurations.length) return;
@@ -645,7 +659,6 @@ function startTracking() {
         const statusInfo = orderStatuses[index];
         
         setTimeout(() => {
-            elapsed += wait;
             updateStatus(index + 1, statusInfo);
             deliveryTimeLabel.textContent = statusInfo.desc;
             
@@ -661,30 +674,30 @@ function startTracking() {
                     break;
                 case 'rider_assigned':
                     courierCard.style.display = 'block';
-                    // 骑手从 spawn 位置沿道路移动到商店
-                    if (roadCoords && roadCoords.length >= 2) {
-                        // 找到 spawn 到 store 之间的路径段
-                        const spawnCoords = [riderSpawn, storePos];
-                        const line2 = L.polyline(spawnCoords, {
-                            color: '#FF6B35', weight: 3, opacity: 0.4, dashArray: '6 4'
-                        }).addTo(map);
-                        animateAlongPath(spawnCoords, isRabbit ? 1500 : 2500, () => {
-                            map.removeLayer(line2);
-                            riderMarker.setLatLng(storePos);
-                            riderMarker.setPopupContent(`<b>${selectedRider}</b><br>📍 已到店`);
-                        });
-                    }
                     riderMarker.setPopupContent(`<b>${selectedRider}</b><br>📍 正赶往商家`);
+                    // 骑手从 spawn 滑到商店（不依赖roadCoords）
+                    const spawnLine = L.polyline([riderSpawn, storePos], {
+                        color: '#FF6B35', weight: 3, opacity: 0.4, dashArray: '6 4'
+                    }).addTo(map);
+                    animateAlongPath([riderSpawn, storePos], isRabbit ? 1800 : 3000, () => {
+                        try { map.removeLayer(spawnLine); } catch(e) {}
+                        riderAtStore = true;
+                        riderMarker.setPopupContent(`<b>${selectedRider}</b><br>📍 已到店`);
+                    });
                     break;
                 case 'rider_arrived':
-                    riderMarker.setLatLng(storePos);
+                    // 如果动画还没完成（极少情况），强制移到商店
+                    if (!riderAtStore) {
+                        riderMarker.setLatLng(storePos);
+                    }
+                    riderAtStore = true;
                     riderMarker.setPopupContent(`<b>${selectedRider}</b><br>📍 已到店`);
                     break;
                 case 'preparing':
                     riderMarker.setPopupContent(`<b>${selectedRider}</b><br>👨‍🍳 等待出餐`);
                     break;
                 case 'picked_up':
-                    roadLine.setStyle({ color: '#FF6B35', weight: 4, opacity: 0.9, dashArray: '' });
+                    if (roadLine) roadLine.setStyle({ opacity: 0.9, weight: 4 });
                     riderMarker.setPopupContent(`<b>${selectedRider}</b><br>🎒 已取餐`);
                     break;
                 case 'delivering':
@@ -693,7 +706,6 @@ function startTracking() {
                     animateAlongPath(roadCoords, dur, () => {
                         riderMarker.setPopupContent(`<b>${selectedRider}</b><br>📬 已送达`);
                     });
-                    // ETA 动态更新
                     break;
                 case 'delivered':
                     riderMarker.setLatLng(homePos);
