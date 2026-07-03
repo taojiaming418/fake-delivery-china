@@ -556,25 +556,39 @@ body.dark-mode .page-header { background: rgba(18,18,18,0.95); }
 .saved-divider span { padding: 0 12px; }
 
 /* ---------- 配送追踪 ---------- */
-.tracking-header {
-    padding: 16px 16px 8px;
+/* tracking page uses .page-header.sticky-top */
+.sticky-top {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
 }
-.tracking-header h2 { font-size: 18px; font-weight: 600; }
+body.dark-mode .sticky-top { background: rgba(18,18,18,0.95); }
 
-/* 当前状态大卡片 */
+/* 当前状态卡片 - 缩小版 */
 .status-hero {
-    margin: 0 16px 12px;
-    padding: 24px 20px;
+    margin: 0 16px 10px;
+    padding: 14px 16px;
     border-radius: var(--radius);
     background: linear-gradient(135deg, var(--primary), var(--primary-light));
     color: #fff;
-    text-align: center;
-    box-shadow: 0 4px 20px rgba(255,107,53,0.3);
+    box-shadow: 0 4px 16px rgba(255,107,53,0.25);
 }
-.status-hero-icon { font-size: 48px; margin-bottom: 10px; }
-.status-hero-text { font-size: 20px; font-weight: 700; margin-bottom: 5px; }
-.status-hero-desc { font-size: 14px; opacity: 0.85; margin-bottom: 14px; }
-.status-progress-bar { height: 4px; background: rgba(255,255,255,0.25); border-radius: 2px; overflow: hidden; }
+
+.status-hero-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.status-hero-icon { font-size: 28px; flex-shrink: 0; }
+.status-hero-right { flex: 1; min-width: 0; }
+.status-hero-text { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
+.status-hero-desc { font-size: 12px; opacity: 0.8; }
+.status-progress-bar { height: 3px; background: rgba(255,255,255,0.25); border-radius: 2px; overflow: hidden; }
 .status-progress-fill { height: 100%; background: #fff; border-radius: 2px; transition: width 0.5s ease; }
 
 /* 地图 */
@@ -730,7 +744,16 @@ body.dark-mode .page-header { background: rgba(18,18,18,0.95); }
 .achievement-badge.locked { opacity: 0.4; }
 
 .order-list { text-align: left; }
-.order-item { padding: 10px 0; border-bottom: 1px solid var(--border); }
+.order-item {
+    padding: 12px 10px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: background 0.15s;
+    margin: 0 -8px;
+}
+.order-item:hover { background: var(--bg); }
+body.dark-mode .order-item:hover { background: #2A2A2A; }
 .order-item-header { display: flex; justify-content: space-between; margin-bottom: 4px; }
 .order-item-restaurant { font-size: 14px; font-weight: 500; }
 .order-item-time { font-size: 11px; color: var(--text-light); }

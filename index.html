@@ -132,23 +132,30 @@
 
     <!-- 配送追踪页面 -->
     <main id="trackingPage" class="page">
-        <div class="tracking-header">
-            <h2 id="trackingTitle"> 闪电配送追踪</h2>
-        </div>
-        
-        <!-- 当前状态卡片（只显示当前步骤，动态变化） -->
-        <div class="status-hero" id="statusHero">
-            <div class="status-hero-icon" id="statusHeroIcon">📋</div>
-            <div class="status-hero-text" id="statusHeroText">订单已提交</div>
-            <div class="status-hero-desc" id="statusHeroDesc">等待支付确认...</div>
-            <div class="status-progress-bar">
-                <div class="status-progress-fill" id="statusProgressFill"></div>
-            </div>
+        <div class="page-header sticky-top">
+            <button class="back-btn" id="backFromTracking">← 返回</button>
+            <h2 id="trackingTitle"> 🛵 闪电配送追踪</h2>
+            <div style="width:40px"></div>
         </div>
 
         <div class="map-container">
             <div id="realMap" class="real-map"></div>
         </div>
+
+        <!-- 当前状态卡片（放在地图后，做小一点） -->
+        <div class="status-hero" id="statusHero">
+            <div class="status-hero-top">
+                <div class="status-hero-icon" id="statusHeroIcon">📋</div>
+                <div class="status-hero-right">
+                    <div class="status-hero-text" id="statusHeroText">订单已提交</div>
+                    <div class="status-hero-desc" id="statusHeroDesc">等待支付确认...</div>
+                </div>
+            </div>
+            <div class="status-progress-bar">
+                <div class="status-progress-fill" id="statusProgressFill"></div>
+            </div>
+        </div>
+
         <div class="delivery-info-card">
             <div>
                 <div class="delivery-time" id="etaTime">--</div>

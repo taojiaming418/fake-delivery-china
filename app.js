@@ -826,8 +826,8 @@ function renderHistory() {
     if (state.orders.length === 0) {
         orderList.innerHTML = '<p style="color: #999; text-align: center;">暂无订单</p>';
     } else {
-        orderList.innerHTML = state.orders.slice(0, 10).map(o => `
-            <div class="order-item">
+        orderList.innerHTML = state.orders.slice(0, 10).map((o, idx) => `
+            <div class="order-item" onclick="showOrderDetail(${idx})">
                 <div class="order-item-header">
                     <span class="order-item-restaurant">${o.restaurant}</span>
                     <span class="order-item-time">${o.time}</span>
@@ -837,6 +837,44 @@ function renderHistory() {
             </div>
         `).join('');
     }
+}
+
+// 查看订单详情
+function showOrderDetail(index) {
+    if (index >= state.orders.length) return;
+    const o = state.orders[index];
+    const modal = document.getElementById('infoModal');
+    const headerTitle = modal.querySelector('.modal-header h2');
+    const content = modal.querySelector('.info-content');
+    const oldTitle = headerTitle.textContent;
+    headerTitle.textContent = `📋 ${o.restaurant}`;
+    content.innerHTML = `
+        <p>🕐 ${o.time}</p>
+        <hr style="border:none;border-top:1px solid var(--border);margin:12px 0">
+        <p style="font-weight:500;margin-bottom:8px">已点商品：</p>
+        <ul style="margin:0 0 12px 20px;font-size:14px;line-height:1.8">
+            ${o.items.map(item => `<li>${item}</li>`).join('')}
+        </ul>
+        <hr style="border:none;border-top:1px solid var(--border);margin:12px 0">
+        <p>💰 省了 <strong style="color:var(--primary)">¥${o.total}</strong></p>
+        <p>🔥 省了 <strong style="color:var(--primary)">${o.calories}</strong> kcal</p>
+    `;
+    // 关闭时恢复标题
+    const closeHandler = function() {
+        headerTitle.textContent = oldTitle;
+        modal.classList.remove('active');
+        document.getElementById('closeInfoBtn').removeEventListener('click', closeHandler);
+    };
+    document.getElementById('closeInfoBtn').addEventListener('click', closeHandler);
+    // 点击背景关闭
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            headerTitle.textContent = oldTitle;
+            modal.classList.remove('active');
+            modal.removeEventListener('click', this);
+        }
+    });
+    modal.classList.add('active');
 }
 
 // 显示提示
@@ -911,6 +949,7 @@ function init() {
     });
     
     document.getElementById('backToHome').addEventListener('click', () => showPage('home'));
+    document.getElementById('backFromTracking').addEventListener('click', () => showPage('home'));
     document.getElementById('backToRestaurant').addEventListener('click', () => showPage('restaurant'));
     document.getElementById('backToCart').addEventListener('click', () => showPage('cart'));
     
@@ -992,7 +1031,7 @@ function init() {
     
     document.getElementById('modalCloseBtn').addEventListener('click', () => {
         document.getElementById('completionModal').classList.remove('active');
-        showPage('home');
+        // 不跳转到首页，留在追踪页面
     });
     
     // 历史
