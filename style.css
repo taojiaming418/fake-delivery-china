@@ -60,7 +60,11 @@ body.dark-mode .delivery-info-card,
 body.dark-mode .courier-card,
 body.dark-mode .modal-content,
 body.dark-mode .checkout-form input,
-body.dark-mode .checkout-form textarea,
+body.dark-mode .checkout-form textarea {
+    background: var(--card);
+    color: var(--text);
+}
+
 body.dark-mode .review-section,
 body.dark-mode .restaurant-detail-meta { background: var(--card); }
 
@@ -94,10 +98,11 @@ body.dark-mode .status-text,
 body.dark-mode .status-label,
 body.dark-mode .back-to-home-btn,
 body.dark-mode .form-group label,
+body.dark-mode .form-group input,
+body.dark-mode .form-group textarea,
 body.dark-mode .app-title,
 body.dark-mode .delivery-name,
 body.dark-mode .delivery-desc,
-body.dark-mode .checkout-form textarea,
 body.dark-mode .meta-label,
 body.dark-mode .meta-value,
 body.dark-mode .banner-name,
@@ -126,6 +131,12 @@ body.dark-mode .tracking-header h2,
 body.dark-mode .courier-card-header,
 body.dark-mode .courier-card-subtitle {
     color: var(--text) !important;
+}
+
+body.dark-mode .form-group input::placeholder,
+body.dark-mode .form-group textarea::placeholder,
+body.dark-mode .search-bar input::placeholder {
+    color: var(--text-light) !important;
 }
 
 body.dark-mode .menu-card-price,
