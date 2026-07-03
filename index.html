@@ -126,29 +126,51 @@
     <!-- 配送追踪页面 -->
     <main id="trackingPage" class="page">
         <div class="tracking-header">
-            <h2> 配送中...</h2>
+            <h2 id="trackingTitle"> 闪电配送追踪</h2>
             <div class="tracking-status" id="trackingStatus">骑手已接单</div>
         </div>
         <div class="map-container">
             <div class="map" id="map">
+                <div class="map-building store">
+                    🏪
+                    <div class="map-building-label">商家已接单</div>
+                </div>
+                <div class="map-building home">
+                    🏠
+                    <div class="map-building-label">你的位置</div>
+                </div>
                 <div class="map-route"></div>
-                <div class="rider" id="rider">🛵</div>
-                <div class="destination">🏠</div>
+                <div class="rider" id="rider">
+                    <span id="riderEmoji">🐇</span>
+                    <div class="rider-info-bubble" id="riderBubble">骑手 · 5分钟</div>
+                </div>
             </div>
         </div>
-        <div class="tracking-info">
-            <div class="info-row">
-                <span>预计送达</span>
-                <span id="etaTime">15分钟</span>
+        <div class="delivery-info-card">
+            <div>
+                <div class="delivery-time" id="etaTime">5min</div>
+                <div class="delivery-time-label">骑手正在飞速赶来！</div>
             </div>
-            <div class="info-row">
-                <span>骑手</span>
-                <span id="riderName">张师傅</span>
+            <div class="delivery-type-badge" id="deliveryTypeBadge">Express</div>
+        </div>
+        <div class="courier-card">
+            <div class="courier-card-header">骑手信息 🛵</div>
+            <div class="courier-card-subtitle">模拟数据</div>
+            <div class="courier-info">
+                <div class="courier-avatar" id="courierAvatar">🐇</div>
+                <div class="courier-details">
+                    <div class="courier-name" id="riderName">闪电骑手</div>
+                    <div class="courier-rating">Express · ★ 4.9 · 正在赶来</div>
+                </div>
+                <button class="courier-call-btn" onclick="showToast('这是假的，打不通 😄')">📞 呼叫</button>
             </div>
-            <div class="info-row">
-                <span>距离</span>
-                <span id="distance">2.3km</span>
+        </div>
+        <div class="current-status">
+            <div>
+                <div class="status-label">当前状态</div>
+                <div class="status-text" id="statusText">闪电送达 5分钟 ⚡</div>
             </div>
+            <button class="back-to-start-btn" onclick="showPage('home')"> 返回首页</button>
         </div>
         <div class="mindful-messages" id="mindfulMessages">
             <!-- 动态显示正念提示 -->

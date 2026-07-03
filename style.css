@@ -612,20 +612,20 @@ body.theme-green {
 /* 配送追踪页面 */
 .tracking-header {
     margin-top: 56px;
-    background: white;
-    padding: 24px 16px;
+    background: var(--primary-color);
+    padding: 16px;
     text-align: center;
+    color: white;
 }
 
 .tracking-header h2 {
-    font-size: 20px;
-    margin-bottom: 8px;
+    font-size: 18px;
+    margin-bottom: 4px;
 }
 
 .tracking-status {
-    font-size: 14px;
-    color: var(--primary-color);
-    font-weight: 500;
+    font-size: 13px;
+    opacity: 0.9;
 }
 
 .map-container {
@@ -633,66 +633,260 @@ body.theme-green {
 }
 
 .map {
-    height: 300px;
-    background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
-    border-radius: 12px;
+    height: 280px;
+    background: #E8F5E9;
+    border-radius: 16px;
     position: relative;
     overflow: hidden;
+    border: 2px solid #C8E6C9;
 }
 
+/* 地图网格 */
+.map::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+}
+
+/* 道路 */
 .map-route {
     position: absolute;
     top: 50%;
-    left: 10%;
-    right: 10%;
-    height: 4px;
-    background: var(--primary-color);
+    left: 15%;
+    right: 15%;
+    height: 8px;
+    background: #90A4AE;
+    border-radius: 4px;
     transform: translateY(-50%);
+}
+
+.map-route::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 5%;
+    right: 5%;
+    height: 2px;
+    background: white;
+    transform: translateY(-50%);
+}
+
+/* 建筑物 */
+.map-building {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: white;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.map-building.store {
+    top: 20%;
+    left: 15%;
+}
+
+.map-building.home {
+    top: 50%;
+    right: 10%;
+    transform: translateY(-50%);
+}
+
+.map-building-label {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: #666;
+    white-space: nowrap;
+    margin-top: 4px;
 }
 
 .rider {
     position: absolute;
     top: 50%;
-    left: 10%;
+    left: 15%;
     transform: translate(-50%, -50%);
-    font-size: 32px;
+    width: 48px;
+    height: 48px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     transition: left 0.5s linear;
+    z-index: 10;
 }
 
-.destination {
+.rider-info-bubble {
     position: absolute;
-    top: 50%;
-    right: 10%;
-    transform: translate(50%, -50%);
-    font-size: 32px;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.tracking-info {
+/* 配送信息卡片 */
+.delivery-info-card {
+    background: var(--primary-color);
+    margin: 16px;
+    padding: 20px;
+    border-radius: 16px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.delivery-time {
+    font-size: 36px;
+    font-weight: 700;
+}
+
+.delivery-time-label {
+    font-size: 12px;
+    opacity: 0.9;
+    margin-top: 4px;
+}
+
+.delivery-type-badge {
+    background: rgba(255,255,255,0.2);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* 骑手信息卡片 */
+.courier-card {
     background: white;
-    margin: 0 16px;
+    margin: 0 16px 16px;
     padding: 16px;
-    border-radius: 12px;
+    border-radius: 16px;
     box-shadow: var(--shadow);
 }
 
-.tracking-info .info-row {
+.courier-card-header {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.courier-card-subtitle {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-bottom: 12px;
+}
+
+.courier-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.courier-avatar {
+    width: 48px;
+    height: 48px;
+    background: var(--bg-color);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.courier-details {
+    flex: 1;
+}
+
+.courier-name {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.courier-rating {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.courier-call-btn {
+    background: var(--bg-color);
+    border: none;
+    padding: 10px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* 当前状态 */
+.current-status {
+    background: white;
+    margin: 0 16px 16px;
+    padding: 16px;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
     display: flex;
     justify-content: space-between;
-    padding: 12px 0;
+    align-items: center;
+}
+
+.status-label {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-bottom: 4px;
+}
+
+.status-text {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.back-to-start-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 24px;
     font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .mindful-messages {
-    padding: 16px;
-    text-align: center;
+    padding: 0 16px 16px;
 }
 
 .mindful-message {
     background: white;
-    padding: 16px;
+    padding: 12px 16px;
     border-radius: 12px;
     margin: 8px 0;
-    font-size: 14px;
+    font-size: 13px;
     color: var(--text-secondary);
     box-shadow: var(--shadow);
     animation: fadeIn 0.5s;

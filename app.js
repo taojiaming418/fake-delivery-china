@@ -231,25 +231,41 @@ function startTracking() {
     showPage('tracking');
     
     const rider = document.getElementById('rider');
+    const riderEmoji = document.getElementById('riderEmoji');
+    const riderBubble = document.getElementById('riderBubble');
+    const courierAvatar = document.getElementById('courierAvatar');
     const status = document.getElementById('trackingStatus');
+    const statusText = document.getElementById('statusText');
     const eta = document.getElementById('etaTime');
-    const distance = document.getElementById('distance');
     const riderName = document.getElementById('riderName');
     const messages = document.getElementById('mindfulMessages');
+    const trackingTitle = document.getElementById('trackingTitle');
+    const deliveryTypeBadge = document.getElementById('deliveryTypeBadge');
     
-    riderName.textContent = riderNames[Math.floor(Math.random() * riderNames.length)];
+    // 根据配送类型设置
+    const isRabbit = state.deliveryType === 'rabbit';
+    const emoji = isRabbit ? '🐇' : '🐢';
+    const typeName = isRabbit ? '闪电' : '慢享';
+    const typeLabel = isRabbit ? 'Express' : 'Standard';
     
-    const duration = state.deliveryType === 'rabbit' ? 8000 : 15000;
+    riderEmoji.textContent = emoji;
+    courierAvatar.textContent = emoji;
+    trackingTitle.textContent = `${emoji} ${typeName}配送追踪`;
+    deliveryTypeBadge.textContent = typeLabel;
+    
+    riderName.textContent = isRabbit ? '闪电骑手' : '慢享骑手';
+    
+    const duration = isRabbit ? 8000 : 15000;
     const steps = 20;
     const stepDuration = duration / steps;
     let currentStep = 0;
     
     // 随机生成距离和时间
     const totalDistance = (Math.random() * 3 + 1).toFixed(1);
-    const totalMinutes = state.deliveryType === 'rabbit' ? 15 : 25;
+    const totalMinutes = isRabbit ? 5 : 15;
     
-    distance.textContent = `${totalDistance}km`;
-    eta.textContent = `${totalMinutes}分钟`;
+    eta.textContent = `${totalMinutes}min`;
+    riderBubble.textContent = `${isRabbit ? '闪电' : '慢享'} · ${totalMinutes}分钟`;
     
     // 显示正念提示
     messages.innerHTML = '';
@@ -272,24 +288,27 @@ function startTracking() {
     const moveInterval = setInterval(() => {
         currentStep++;
         const progress = currentStep / steps;
-        rider.style.left = `${10 + progress * 80}%`;
+        rider.style.left = `${15 + progress * 70}%`;
         
         // 更新状态
         if (progress < 0.3) {
             status.textContent = '骑手已接单，正在取餐';
+            statusText.textContent = `${typeName}配送中...`;
         } else if (progress < 0.7) {
             status.textContent = '骑手正在配送中';
+            statusText.textContent = `${typeName}送达 ${Math.ceil(totalMinutes * (1-progress))}分钟`;
         } else if (progress < 0.9) {
             status.textContent = '骑手即将到达';
+            statusText.textContent = `即将到达！`;
         } else {
             status.textContent = '配送完成！';
+            statusText.textContent = `配送完成 `;
         }
         
-        // 更新 ETA 和距离
+        // 更新 ETA
         const remainingMinutes = Math.ceil(totalMinutes * (1 - progress));
-        const remainingDistance = (totalDistance * (1 - progress)).toFixed(1);
-        eta.textContent = `${remainingMinutes}分钟`;
-        distance.textContent = `${remainingDistance}km`;
+        eta.textContent = `${remainingMinutes}min`;
+        riderBubble.textContent = `${isRabbit ? '闪电' : '慢享'} · ${remainingMinutes}分钟`;
         
         if (currentStep >= steps) {
             clearInterval(moveInterval);
