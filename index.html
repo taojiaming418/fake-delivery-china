@@ -109,6 +109,14 @@
             <h2>📍 填写地址</h2>
         </div>
         <div class="checkout-form">
+            <div id="savedAddressCard" class="saved-address-card" style="display:none">
+                <div class="saved-address-header">📍 上次配送地址</div>
+                <div class="saved-address-info" id="savedAddressInfo">
+                    <!-- 动态 -->
+                </div>
+                <button class="use-saved-btn" id="useSavedAddrBtn">使用此地址</button>
+                <div class="saved-divider"><span>或填写新地址</span></div>
+            </div>
             <div class="form-group">
                 <label>收货人</label>
                 <input type="text" id="receiverName" placeholder="请输入姓名">

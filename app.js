@@ -864,22 +864,75 @@ function init() {
     document.getElementById('backToRestaurant').addEventListener('click', () => showPage('restaurant'));
     document.getElementById('backToCart').addEventListener('click', () => showPage('cart'));
     
-    document.getElementById('checkoutBtn').addEventListener('click', () => showPage('checkout'));
+    document.getElementById('checkoutBtn').addEventListener('click', () => {
+        // 显示已保存地址
+        const saved = localStorage.getItem('fakeDeliveryAddress');
+        const savedCard = document.getElementById('savedAddressCard');
+        const savedInfo = document.getElementById('savedAddressInfo');
+        
+        if (saved) {
+            try {
+                const addr = JSON.parse(saved);
+                savedInfo.innerHTML = `
+                    <div class="addr-name">${addr.name}</div>
+                    <div>📞 ${addr.phone}</div>
+                    <div>📍 ${addr.address}</div>
+                `;
+                savedCard.style.display = 'block';
+            } catch(e) {
+                savedCard.style.display = 'none';
+            }
+        } else {
+            savedCard.style.display = 'none';
+        }
+        
+        showPage('checkout');
+    });
+    
+    // 使用已保存地址
+    document.getElementById('useSavedAddrBtn').addEventListener('click', () => {
+        const saved = localStorage.getItem('fakeDeliveryAddress');
+        if (saved) {
+            const addr = JSON.parse(saved);
+            document.getElementById('receiverName').value = addr.name;
+            document.getElementById('receiverPhone').value = addr.phone;
+            document.getElementById('receiverAddress').value = addr.address;
+            document.getElementById('savedAddressCard').style.display = 'none';
+            showToast('已填入上次地址 ✅');
+        }
+    });
     
     document.getElementById('confirmOrderBtn').addEventListener('click', () => {
-        const name = document.getElementById('receiverName').value;
-        const phone = document.getElementById('receiverPhone').value;
-        const address = document.getElementById('receiverAddress').value;
+        const name = document.getElementById('receiverName').value.trim();
+        const phone = document.getElementById('receiverPhone').value.trim();
+        const address = document.getElementById('receiverAddress').value.trim();
         
         if (!name || !phone || !address) {
             showToast('请填写完整信息');
             return;
         }
         
+        // 保存地址到本地
+        const addrData = { name, phone, address };
+        localStorage.setItem('fakeDeliveryAddress', JSON.stringify(addrData));
+        
         // 显示支付弹窗
         const total = state.cart.reduce((sum, item) => sum + item.price, 0) + (state.deliveryType === 'rabbit' ? 3 : 5);
         showPaymentModal(total);
     });
+    
+    // 自动填充已保存的地址
+    (function loadSavedAddress() {
+        const saved = localStorage.getItem('fakeDeliveryAddress');
+        if (saved) {
+            try {
+                const addr = JSON.parse(saved);
+                document.getElementById('receiverName').value = addr.name || '';
+                document.getElementById('receiverPhone').value = addr.phone || '';
+                document.getElementById('receiverAddress').value = addr.address || '';
+            } catch(e) {}
+        }
+    })();
     
     // 支付弹窗关闭后开始追踪
     document.getElementById('paymentCloseBtn').addEventListener('click', () => {

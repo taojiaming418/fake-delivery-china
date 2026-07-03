@@ -105,6 +105,28 @@ body.dark-mode .config-option-btn.active {
     color: white;
 }
 
+body.dark-mode .saved-address-card {
+    background: #2a2a4a;
+    border-color: #3a3a5a;
+}
+
+body.dark-mode .saved-address-header {
+    color: #B0B0B0;
+}
+
+body.dark-mode .saved-address-info {
+    color: #CCC;
+}
+
+body.dark-mode .saved-divider {
+    color: #808080;
+}
+
+body.dark-mode .saved-divider::before,
+body.dark-mode .saved-divider::after {
+    background: #3a3a5a;
+}
+
 /* 主题色 */
 body.theme-purple {
     --primary-color: #9C27B0;
@@ -1532,6 +1554,70 @@ body.theme-green {
     color: var(--text-light);
     font-size: 13px;
     margin-bottom: 24px;
+}
+
+/* 已保存地址卡片 */
+.saved-address-card {
+    background: #FFF8E1;
+    border: 1px solid #FFE082;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 16px;
+}
+
+.saved-address-header {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #F57F17;
+}
+
+.saved-address-info {
+    font-size: 13px;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+.saved-address-info .addr-name {
+    font-weight: 500;
+}
+
+.use-saved-btn {
+    width: 100%;
+    padding: 10px;
+    background: #FFA000;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.use-saved-btn:hover {
+    background: #FF8F00;
+}
+
+.saved-divider {
+    display: flex;
+    align-items: center;
+    margin-top: 14px;
+    color: #999;
+    font-size: 12px;
+}
+
+.saved-divider::before,
+.saved-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #E0E0E0;
+}
+
+.saved-divider span {
+    padding: 0 12px;
 }
 
 /* 订单状态时间线 */
