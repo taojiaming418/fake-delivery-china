@@ -512,7 +512,48 @@ const restaurants = [
 ];
 
 // 骑手名字
-const riderNames = ["张师傅", "李师傅", "王师傅", "刘师傅", "陈师傅", "杨师傅", "赵师傅", "黄师傅"];
+const riderNames = ["张师傅", "李师傅", "王师傅", "刘师傅", "陈师傅", "杨师傅", "赵师傅", "黄师傅", "周师傅", "吴师傅", "郑师傅", "刘师傅"];
+
+// 餐厅贴纸颜色
+const restaurantBannerColors = [
+    '#FF4757', '#2ED573', '#1E90FF', '#FFA502', '#A29BFE', '#FDCB6E',
+    '#00CEC9', '#E17055', '#0984E3', '#6C5CE7', '#00B894', '#E84393',
+    '#FDCB6E', '#636E72', '#F19066', '#3DC1D3', '#574B90', '#E15F41',
+    '#786FA6', '#F19066'
+];
+
+// 为每个餐厅生成评论
+restaurants.forEach((r, idx) => {
+    r.reviewList = generateReviews(r);
+    r.bannerColor = restaurantBannerColors[idx % restaurantBannerColors.length];
+});
+
+function generateReviews(restaurant) {
+    const scores = [5.0, 5.0, 4.5, 4.5, 4.0, 4.0, 3.5, 3.0].slice(0, Math.min(restaurant.reviews, 50));
+    const reviewNamesPool = ["吃货小张", "美食家老李", "打工人小王", "吃货阿花", "外卖达人", "深夜食客", "吃货一号", "隔壁老王", "美食猎人", "碳水爱好者", "不吃辣的喵", "深夜饿鬼", "打工人小李", "吃货肥宅", "减肥失败", "好吃就酱", "味蕾探险家", "咖啡续命", "奶茶大王", "加班狗本人"];
+    const goodComments = ["味道不错", "份量很足", "太好吃了", "性价比高", "包装很好", "送到还是热的", "推荐推荐", "下次还会点", "很好吃", "量很大", "味道正宗", "馋哭了", "yyds", "绝了", "每次必点"];
+    const badComments = ["等太久了", "有点凉了", "辣度不对", "份量少了", "送错东西了", "太咸了", "太油了", "味道一般", "不值这个价", "踩雷了"];
+    const foodEmojis = ['🍔', '🍜', '🥩', '🍗', '🥟', '🍕', '🍣', '🌮', '🥘', '🧋', '🍺', '🍰', '🍦'];
+    const timeLabels = ["刚刚", "5分钟前", "15分钟前", "30分钟前", "1小时前", "2小时前", "3小时前", "昨天", "前天", "3天前", "一周前", "两周前"];
+    
+    const reviewList = [];
+    for (let i = 0; i < scores.length; i++) {
+        const isGood = scores[i] >= 4.5;
+        let content = isGood
+            ? goodComments[Math.floor(Math.random() * goodComments.length)]
+            : badComments[Math.floor(Math.random() * badComments.length)];
+        if (Math.random() > 0.5) {
+            content += ' ' + foodEmojis[Math.floor(Math.random() * foodEmojis.length)];
+        }
+        reviewList.push({
+            name: reviewNamesPool[Math.floor(Math.random() * reviewNamesPool.length)],
+            score: scores[i],
+            content,
+            time: timeLabels[Math.floor(Math.random() * timeLabels.length)]
+        });
+    }
+    return reviewList;
+}
 
 // 订单状态流程
 const orderStatuses = [

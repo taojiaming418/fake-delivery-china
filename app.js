@@ -79,34 +79,35 @@ function renderRestaurants(filter = '') {
     
     list.innerHTML = filtered.map(r => `
         <div class="restaurant-card" onclick="showRestaurant(${r.id})">
-            <div class="restaurant-header">
-                <div>
-                    <div class="restaurant-name">${r.emoji} ${r.name}</div>
-                    <div class="restaurant-cuisine">${r.cuisine} ${r.tag ? '· ' + r.tag : ''}</div>
-                </div>
-                <div class="restaurant-rating">
-                    <span class="rating-stars">★</span>
-                    <span class="rating-score">${r.rating}</span>
-                    <span class="rating-count">(${r.reviews})</span>
-                </div>
+            <div class="restaurant-banner" style="background: ${r.bannerColor}">
+                <span class="restaurant-banner-emoji">${r.emoji}</span>
+                <span class="restaurant-banner-tag">${r.tag}</span>
             </div>
-            <div class="restaurant-meta">
-                <span>⏱ ${r.deliveryTime}</span>
-                <span> ¥${r.deliveryFee}</span>
-            </div>
-            <div class="menu-preview">
-                ${r.menu.slice(0, 3).map(m => `
-                    <div class="menu-item-preview">
-                        <div class="menu-item-img">${m.emoji}</div>
-                        <div class="menu-item-name">${m.name}</div>
-                        <div class="menu-item-desc">${m.desc}</div>
-                        <div class="menu-item-calories">🔥 ${m.calories}kcal</div>
-                        <div class="menu-item-footer">
-                            <span class="menu-item-price">¥${m.price}</span>
-                            <button class="add-btn" onclick="event.stopPropagation(); addToCart(${r.id}, '${m.name}')">+</button>
-                        </div>
+            <div class="restaurant-body">
+                <div class="restaurant-header">
+                    <div>
+                        <div class="restaurant-name">${r.name}</div>
+                        <div class="restaurant-cuisine">${r.cuisine}</div>
                     </div>
-                `).join('')}
+                    <div class="restaurant-rating">
+                        <span class="rating-stars">★</span>
+                        <span class="rating-score">${r.rating}</span>
+                    </div>
+                </div>
+                <div class="restaurant-meta">
+                    <span>⏱ ${r.deliveryTime}</span>
+                    <span> ¥${r.deliveryFee}</span>
+                    <span>月售${(r.reviews / 10).toFixed(0)}</span>
+                </div>
+                <div class="menu-preview">
+                    ${r.menu.slice(0, 3).map(m => `
+                        <div class="menu-item-preview">
+                            <span class="menu-item-emoji">${m.emoji || '🍽️'}</span>
+                            <span class="menu-item-name">${m.name}</span>
+                            <span class="menu-item-preview-price">¥${m.price}</span>
+                        </div>
+                    `).join('')}
+                </div>
             </div>
         </div>
     `).join('');
@@ -119,41 +120,122 @@ function showRestaurant(id) {
     
     state.currentRestaurant = restaurant;
     document.getElementById('restaurantName').textContent = restaurant.name;
+    
+    // Banner
+    const banner = restaurant.reviewList?.[0]?.content || restaurant.name;
     document.getElementById('restaurantInfo').innerHTML = `
-        <div class="info-row">
-            <span class="info-label">菜系</span>
-            <span class="info-value">${restaurant.cuisine}</span>
+        <div class="restaurant-banner-detail" style="background: ${restaurant.bannerColor || '#FF6B35'}">
+            <div class="banner-emoji">${restaurant.emoji}</div>
+            <div class="banner-info">
+                <div class="banner-name">${restaurant.name}</div>
+                <div class="banner-stats">
+                    <span>★ ${restaurant.rating}</span>
+                    <span>月售${(restaurant.reviews / 10).toFixed(0)}</span>
+                    <span>⏱ ${restaurant.deliveryTime}</span>
+                </div>
+            </div>
         </div>
-        <div class="info-row">
-            <span class="info-label">评分</span>
-            <span class="info-value">★ ${restaurant.rating} (${restaurant.reviews}条评价)</span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">配送时间</span>
-            <span class="info-value">${restaurant.deliveryTime}</span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">配送费</span>
-            <span class="info-value">¥${restaurant.deliveryFee}</span>
+        <div class="restaurant-detail-meta">
+            <div class="meta-item">
+                <span class="meta-label">起送</span>
+                <span class="meta-value">¥${restaurant.minOrder}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">配送</span>
+                <span class="meta-value">¥${restaurant.deliveryFee}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">评分</span>
+                <span class="meta-value">★ ${restaurant.rating}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">评价</span>
+                <span class="meta-value">${restaurant.reviews}条</span>
+            </div>
         </div>
     `;
     
+    // 菜单
     document.getElementById('menuList').innerHTML = restaurant.menu.map(m => `
-        <div class="menu-card">
+        <div class="menu-card" onclick="addToCart(${restaurant.id}, '${m.name}')">
             <div class="menu-card-img">${m.emoji}</div>
             <div class="menu-card-content">
                 <div class="menu-card-name">${m.name}</div>
                 <div class="menu-card-desc">${m.desc}</div>
-                <div class="menu-card-calories">🔥 ${m.calories}kcal</div>
                 <div class="menu-card-footer">
                     <span class="menu-card-price">¥${m.price}</span>
-                    <button class="add-btn" onclick="addToCart(${restaurant.id}, '${m.name}')">+</button>
+                    <span class="menu-card-calories">🔥 ${m.calories}kcal</span>
                 </div>
             </div>
         </div>
     `).join('');
     
+    // 评论
+    const reviewSection = document.getElementById('reviewSection');
+    if (reviewSection && restaurant.reviewList) {
+        const totalScore = restaurant.reviewList.reduce((s, r) => s + r.score, 0);
+        const avgScore = (totalScore / restaurant.reviewList.length).toFixed(1);
+        const distribution = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0};
+        restaurant.reviewList.forEach(r => {
+            const key = Math.floor(r.score);
+            distribution[key] = (distribution[key] || 0) + 1;
+        });
+        
+        reviewSection.innerHTML = `
+            <div class="review-header">
+                <div class="review-summary">
+                    <div class="review-score">★ ${avgScore}</div>
+                    <div class="review-count">${restaurant.reviewList.length}条评价</div>
+                </div>
+                <div class="review-bars">
+                    ${[5, 4, 3, 2, 1].map(n => {
+                        const pct = (distribution[n] / restaurant.reviewList.length * 100).toFixed(0);
+                        return `<div class="review-bar-row"><span>${n}分</span><div class="review-bar-bg"><div class="review-bar-fill" style="width:${pct}%"></div></div><span>${pct}%</span></div>`;
+                    }).join('')}
+                </div>
+            </div>
+            <div class="review-tabs">
+                <button class="review-tab active" onclick="filterReviews('all')">全部</button>
+                <button class="review-tab" onclick="filterReviews('good')">好评</button>
+                <button class="review-tab" onclick="filterReviews('bad')">差评</button>
+                <button class="review-tab" onclick="filterReviews('image')">有图</button>
+            </div>
+            <div id="reviewList" class="review-list"></div>
+        `;
+        window._currentReviews = restaurant.reviewList;
+        filterReviews('all');
+    }
+    
     showPage('restaurant');
+}
+
+// 评论筛选
+function filterReviews(type) {
+    const list = document.getElementById('reviewList');
+    const reviews = window._currentReviews || [];
+    
+    document.querySelectorAll('.review-tab').forEach(t => t.classList.remove('active'));
+    event?.target?.classList?.add('active');
+    
+    let filtered = reviews;
+    if (type === 'good') filtered = reviews.filter(r => r.score >= 4.5);
+    if (type === 'bad') filtered = reviews.filter(r => r.score < 4);
+    if (type === 'image') filtered = reviews.filter(r => Math.random() > 0.7); // 随机显示"有图"
+    
+    list.innerHTML = filtered.slice(0, 10).map(r => `
+        <div class="review-item">
+            <div class="review-item-header">
+                <span class="review-item-name">${r.name}</span>
+                <span class="review-item-score">${'★'.repeat(Math.floor(r.score))}${'☆'.repeat(5 - Math.floor(r.score))}</span>
+                <span class="review-item-time">${r.time}</span>
+            </div>
+            <div class="review-item-content">${r.content}</div>
+        </div>
+    `).join('');
+    
+    if (filtered.length === 0) {
+        list.innerHTML = '<p style="color:#999;text-align:center;padding:20px">暂无评价</p>';
+    }
 }
 
 // 显示商品配置弹窗
@@ -732,6 +814,34 @@ function init() {
             btn.classList.add('active');
             state.deliveryType = btn.dataset.type;
         });
+    });
+    
+    // 夜晚自动进入深夜模式（22:00-6:00）
+    function checkNightMode() {
+        const hour = new Date().getHours();
+        const isNight = hour >= 22 || hour < 6;
+        const saved = localStorage.getItem('fakeDeliveryDarkMode');
+        let darkMode = false;
+        
+        if (saved !== null) {
+            darkMode = saved === 'true';
+        } else if (isNight) {
+            darkMode = true;
+        }
+        
+        if (darkMode) {
+            document.body.classList.add('dark-mode');
+        }
+        document.getElementById('darkModeBtn').textContent = darkMode ? '☀️' : '🌙';
+    }
+    checkNightMode();
+    
+    // 深色模式切换
+    document.getElementById('darkModeBtn').addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('fakeDeliveryDarkMode', isDark.toString());
+        document.getElementById('darkModeBtn').textContent = isDark ? '☀️' : '🌙';
     });
     
     // 主题切换

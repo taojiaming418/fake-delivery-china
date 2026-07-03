@@ -27,6 +27,82 @@ body {
     color: var(--text-primary);
     min-height: 100vh;
     overflow-x: hidden;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* 深夜模式 */
+body.dark-mode {
+    --bg-color: #1a1a2e;
+    --card-bg: #16213e;
+    --text-primary: #e0e0e0;
+    --text-secondary: #b0b0b0;
+    --text-light: #808080;
+    --border-color: #2a2a4a;
+    --shadow: 0 2px 8px rgba(0,0,0,0.3);
+    --shadow-lg: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+body.dark-mode .header {
+    background: linear-gradient(135deg, #0f3460, #1a1a2e);
+    border-bottom-color: #2a2a4a;
+}
+
+body.dark-mode .restaurant-card,
+body.dark-mode .menu-card,
+body.dark-mode .cart-item,
+body.dark-mode .delivery-info-card,
+body.dark-mode .courier-card,
+body.dark-mode .order-timeline,
+body.dark-mode .modal-content,
+body.dark-mode .search-bar input,
+body.dark-mode .checkout-form input,
+body.dark-mode .checkout-form textarea {
+    background: var(--card-bg);
+    color: var(--text-primary);
+}
+
+body.dark-mode .search-bar input {
+    background: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+body.dark-mode .menu-item-preview {
+    border-bottom-color: var(--border-color);
+}
+
+body.dark-mode .review-item {
+    border-bottom-color: var(--border-color);
+}
+
+body.dark-mode .review-bar-bg {
+    background: #2a2a4a;
+}
+
+body.dark-mode .review-section,
+body.dark-mode .restaurant-detail-meta {
+    background: var(--card-bg);
+}
+
+body.dark-mode .review-tab {
+    background: #0f3460;
+    color: var(--text-secondary);
+}
+
+body.dark-mode .review-tab.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+body.dark-mode .config-option-btn {
+    background: #0f3460;
+    color: var(--text-secondary);
+    border-color: var(--border-color);
+}
+
+body.dark-mode .config-option-btn.active {
+    background: var(--primary-color);
+    color: white;
 }
 
 /* 主题色 */
@@ -183,10 +259,11 @@ body.theme-green {
     padding: 16px;
 }
 
+/* 餐厅卡片 - 新版带banner */
 .restaurant-card {
     background: white;
     border-radius: 12px;
-    padding: 16px;
+    overflow: hidden;
     margin-bottom: 12px;
     box-shadow: var(--shadow);
     cursor: pointer;
@@ -198,11 +275,52 @@ body.theme-green {
     box-shadow: var(--shadow-lg);
 }
 
+.restaurant-banner {
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.restaurant-banner::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.2));
+}
+
+.restaurant-banner-emoji {
+    font-size: 48px;
+    opacity: 0.9;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+.restaurant-banner-tag {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: rgba(0,0,0,0.4);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 11px;
+    backdrop-filter: blur(4px);
+}
+
+.restaurant-body {
+    padding: 12px;
+}
+
 .restaurant-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 12px;
+    margin-bottom: 6px;
 }
 
 .restaurant-name {
@@ -214,7 +332,7 @@ body.theme-green {
 .restaurant-cuisine {
     font-size: 12px;
     color: var(--text-light);
-    margin-top: 4px;
+    margin-top: 2px;
 }
 
 .restaurant-rating {
@@ -242,7 +360,7 @@ body.theme-green {
 .restaurant-meta {
     display: flex;
     gap: 16px;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     font-size: 13px;
     color: var(--text-secondary);
 }
@@ -253,16 +371,300 @@ body.theme-green {
     gap: 4px;
 }
 
+/* 菜品预览 */
 .menu-preview {
     display: flex;
-    gap: 12px;
-    overflow-x: auto;
-    padding-bottom: 8px;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-color);
 }
 
 .menu-item-preview {
-    min-width: 140px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    font-size: 13px;
+}
+
+.menu-item-emoji {
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.menu-item-name {
+    flex: 1;
+    color: var(--text-secondary);
+}
+
+.menu-item-preview-price {
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+/* 餐厅详情 - Banner */
+.restaurant-banner-detail {
+    height: 140px;
+    display: flex;
+    align-items: flex-end;
+    padding: 16px;
+    gap: 12px;
+    color: white;
+    position: relative;
+}
+
+.banner-emoji {
+    font-size: 48px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.banner-info {
+    flex: 1;
+}
+
+.banner-name {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.banner-stats {
+    display: flex;
+    gap: 12px;
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+/* 餐厅详情 - 信息 */
+.restaurant-detail-meta {
+    display: flex;
+    justify-content: space-around;
+    padding: 16px;
+    background: white;
+    margin-bottom: 12px;
+}
+
+.meta-item {
+    text-align: center;
+}
+
+.meta-label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-light);
+    margin-bottom: 4px;
+}
+
+.meta-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* 菜单卡片 */
+.menu-card {
+    background: white;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 8px;
+    display: flex;
+    gap: 12px;
+    cursor: pointer;
+    transition: transform 0.1s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.menu-card:active {
+    transform: scale(0.98);
+}
+
+.menu-card-img {
+    width: 60px;
+    height: 60px;
     background: var(--bg-color);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    flex-shrink: 0;
+}
+
+.menu-card-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.menu-card-name {
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.menu-card-desc {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.menu-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.menu-card-price {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.menu-card-calories {
+    font-size: 11px;
+    color: var(--text-light);
+}
+
+/* 评价区域 */
+.review-section {
+    background: white;
+    margin-top: 12px;
+    padding: 16px;
+    border-radius: 12px 12px 0 0;
+}
+
+.review-header {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.review-summary {
+    text-align: center;
+    min-width: 80px;
+}
+
+.review-score {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.review-count {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 4px;
+}
+
+.review-bars {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.review-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--text-light);
+}
+
+.review-bar-row span:first-child {
+    width: 28px;
+    text-align: right;
+}
+
+.review-bar-row span:last-child {
+    width: 32px;
+    text-align: right;
+}
+
+.review-bar-bg {
+    flex: 1;
+    height: 6px;
+    background: var(--bg-color);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.review-bar-fill {
+    height: 100%;
+    background: #FFC107;
+    border-radius: 3px;
+}
+
+.review-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.review-tab {
+    padding: 6px 16px;
+    border: none;
+    background: var(--bg-color);
+    border-radius: 16px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.review-tab.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+.review-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.review-item {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.review-item:last-child {
+    border-bottom: none;
+}
+
+.review-item-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.review-item-name {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.review-item-score {
+    font-size: 11px;
+    color: #FFC107;
+}
+
+.review-item-time {
+    font-size: 11px;
+    color: var(--text-light);
+    margin-left: auto;
+}
+
+.review-item-content {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
     border-radius: 8px;
     padding: 8px;
 }
@@ -468,10 +870,6 @@ body.theme-green {
 
 .menu-card-price {
     font-size: 18px;
-    font-weight: 600;
-    color: var(--primary-color);
-}
-
 /* 购物车页面 */
 .cart-items {
     padding: 16px;
